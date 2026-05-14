@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grammarly Super</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="manifest" href="manifest.json">
+  <style>
+    body { font-family: system-ui; background: linear-gradient(135deg, #0a0a0a, #1a1a2e); }
+  </style>
+</head>
+<body class="text-white min-h-screen p-6">
+  <div class="max-w-4xl mx-auto">
+    <!-- Login -->
+    <div id="loginScreen">
+      <h1 class="text-5xl font-bold text-center text-green-400 mb-2">Grammarly Super</h1>
+      <p class="text-center text-zinc-400 mb-8">Private • Cloud • Gemini AI • Avro Bangla</p>
+      <input id="username" type="text" value="nayeem" placeholder="Username" class="w-full mb-4 p-4 bg-zinc-800 rounded-3xl text-lg">
+      <input id="password" type="password" placeholder="Password" class="w-full mb-6 p-4 bg-zinc-800 rounded-3xl text-lg">
+      <button onclick="login()" class="w-full py-5 bg-green-500 hover:bg-green-400 text-black font-bold text-xl rounded-3xl">LOGIN SECURELY</button>
+    </div>
+
+    <!-- Main App -->
+    <div id="mainApp" class="hidden">
+      <div class="flex justify-between items-center mb-6">
+        <h1 class="text-4xl font-bold text-green-400">Grammarly Super</h1>
+        <div>
+          <button onclick="toggleAvro()" class="px-6 py-3 bg-zinc-800 hover:bg-zinc-700 rounded-3xl mr-3">Avro Bangla <span id="avroStatus" class="text-green-400">OFF</span></button>
+          <button onclick="logout()" class="px-6 py-3 bg-red-500/20 text-red-400 hover:bg-red-500/30 rounded-3xl">Logout</button>
+        </div>
+      </div>
+      <textarea id="editor" rows="14" placeholder="Start writing... (English or Bangla with Avro ON)" class="w-full p-8 bg-zinc-900 rounded-3xl text-xl border border-zinc-700 focus:outline-none resize-none"></textarea>
+      <div class="flex gap-4 mt-6">
+        <button onclick="checkGrammar()" class="flex-1 py-6 bg-white text-black font-bold text-xl rounded-3xl">Check Grammar + Professional Style</button>
+        <button onclick="getAIRewrite()" class="flex-1 py-6 bg-green-500 hover:bg-green-400 text-black font-bold text-xl rounded-3xl">Gemini AI Full Professional Rewrite</button>
+      </div>
+      <div id="results" class="mt-8 bg-zinc-900 rounded-3xl p-8 min-h-[200px] text-sm overflow-auto"></div>
+    </div>
+  </div>
+
+  <script>
+    const REAL_PASSWORD = "super123";
+    function login() {
+      const pass = document.getElementById('password').value;
+      if (pass === REAL_PASSWORD) {
+        document.getElementById('loginScreen').classList.add('hidden');
+        document.getElementById('mainApp').classList.remove('hidden');
+      } else {
+        alert("Wrong password! Default is 'super123'");
+      }
+    }
+    function logout() {
+      document.getElementById('mainApp').classList.add('hidden');
+      document.getElementById('loginScreen').classList.remove('hidden');
+    }
+    let avroEnabled = false;
+    function toggleAvro() {
+      avroEnabled = !avroEnabled;
+      document.getElementById('avroStatus').textContent = avroEnabled ? 'ON ✅' : 'OFF';
+      alert(avroEnabled ? 'Avro Phonetic Bangla is ON!' : 'Avro OFF');
+    }
+    async function checkGrammar() {
+      const text = document.getElementById('editor').value;
+      const resDiv = document.getElementById('results');
+      resDiv.innerHTML = '<p class="text-green-400">Checking professional grammar...</p>';
+      try {
+        const r = await fetch('https://grammarly-super.onrender.com/v2/check', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+          body: `text=${encodeURIComponent(text)}&language=en`
+        });
+        const data = await r.json();
+        resDiv.innerHTML = `<pre class="text-xs">${JSON.stringify(data, null, 2)}</pre>`;
+      } catch(e) { resDiv.innerHTML = '<p class="text-red-400">Connection error</p>'; }
+    }
+    async function getAIRewrite() {
+      const text = document.getElementById('editor').value;
+      const resDiv = document.getElementById('results');
+      resDiv.innerHTML = '<p class="text-green-400">Gemini AI professional rewrite...</p>';
+      try {
+        const r = await fetch('https://grammarly-super.onrender.com/v2/check', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+          body: `text=${encodeURIComponent(text)}&language=en&rule=GEMINI_AI_SUGGESTIONS`
+        });
+        const data = await r.json();
+        resDiv.innerHTML = `<h3 class="font-bold">Gemini Professional Version:</h3><p class="mt-4 whitespace-pre-wrap">${JSON.stringify(data, null, 2)}</p>`;
+      } catch(e) { resDiv.innerHTML = '<p class="text-red-400">Connection error</p>'; }
+    }
+  </script>
+</body>
+</html>
