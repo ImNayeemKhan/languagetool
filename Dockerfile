@@ -1,10 +1,10 @@
 FROM maven:3.9.6-eclipse-temurin-21 AS build
 WORKDIR /app
 COPY . .
-RUN ./mvnw clean compile -DskipTests -pl languagetool-server
+RUN mvn clean compile -DskipTests -pl languagetool-server
 
 FROM eclipse-temurin:21-jre
 WORKDIR /app
 COPY --from=build /app /app
 EXPOSE 8080
-CMD ["./mvnw", "-pl", "languagetool-server", "exec:java", "-Dexec.mainClass=org.languagetool.server.HTTPServer", "-Dexec.args=--port 8080 --public"]
+CMD ["mvn", "-pl", "languagetool-server", "exec:java", "-Dexec.mainClass=org.languagetool.server.HTTPServer", "-Dexec.args=--port 8080 --public"]
