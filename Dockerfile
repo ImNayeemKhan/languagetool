@@ -3,7 +3,7 @@ WORKDIR /app
 COPY . .
 RUN mvn clean compile -DskipTests -pl languagetool-server
 
-FROM eclipse-temurin:21-jre
+FROM maven:3.9.6-eclipse-temurin-21
 WORKDIR /app
 COPY --from=build /app /app
 EXPOSE 8080
